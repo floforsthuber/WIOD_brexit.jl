@@ -1,0 +1,13 @@
+name = "WIOD_brexit"
+uuid = "fe468ab1-311e-488f-82b2-701f6a8aeb5b"
+authors = ["Florian Forsthuber <florian.forsthuber@gmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.6"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
