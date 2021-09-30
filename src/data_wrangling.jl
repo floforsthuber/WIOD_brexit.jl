@@ -42,6 +42,3 @@ raw_long = stack(raw, Not(1:4)) # transform to long format
 raw_long = hcat(raw_long, DataFrame(reduce(vcat, permutedims.(split.(raw_long.variable, "___"))), [:p_s_iso, :p_s_long, :p_s_short, :p_ctry]))
 
 raw_long = raw_long[:, Not(:variable)] # delete combined named column
-
-
-
