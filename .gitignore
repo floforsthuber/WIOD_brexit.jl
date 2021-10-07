@@ -2,6 +2,5 @@
 *.jl.cov
 *.jl.mem
 
-# raw data
-WIOT2014_Nov16_ROW.xlsb
-WIOT2014_Nov16_ROW.xlsx
+# data
+data/*
