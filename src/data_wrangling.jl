@@ -43,7 +43,10 @@ raw_long = stack(raw, Not(1:4)) # transform to long format
 raw_long = hcat(raw_long, DataFrame(reduce(vcat, permutedims.(split.(raw_long.variable, "___"))), [:p_s_iso, :p_s_long, :p_s_short, :p_ctry]))
 #raw_long = raw_long[:, Not(:variable)] # delete combined named column
 
-EU27 = ["AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE"]
+begin
+    EU27 = ["AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", 
+    "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE"]
+end
 
 raw_long_EU = filter(row -> row.r_ctry in [EU27; "GBR"], raw_long)
 filter!(row -> row.p_ctry in [EU27; "GBR"], raw_long_EU)
