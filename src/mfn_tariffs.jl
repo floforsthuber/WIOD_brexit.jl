@@ -23,17 +23,17 @@ transform!(raw_CPA_NACE, names(raw_CPA_NACE) .=> ByRow(string) .=> names(raw_CPA
 raw_CPA_NACE[:, :CPA2digits] = lpad.(raw_CPA_NACE[:, :CPA2digits], 2, '0') # pad with leading zeros so all have 2 digits
 
 # combine HS2007, CPA2008, CPA2digits, NACE Rev. 2
-c_table = leftjoin(raw_HS_CPA, raw_CPA_NACE, on=:CPA2digits)
+c_table_HS_NACE = leftjoin(raw_HS_CPA, raw_CPA_NACE, on=:CPA2digits)
 
 # HS2007 vis-a-vis HS2017
 raw_HS_HS = CSV.read("data/HS2007_HS2017.csv", DataFrame)
 raw_HS_HS = lpad.(raw_HS_HS[:, [:HS2017, :HS2007]], 6, '0') # pad with leading zeros so all have 6 digits
 
 # add correspondence vis-a-vis HS2017 as tariff data from WTO uses HS2017
-c_table = leftjoin(c_table, raw_HS_HS, on=:HS2007)
-describe(c_table)[:, :nmissing] # 62 of 5642 HS2007 codes do not have a corresponding HS2017 code (would say thats pretty good!)
+c_table_HS_NACE = leftjoin(c_table_HS_NACE, raw_HS_HS, on=:HS2007)
+describe(c_table_HS_NACE)[:, :nmissing] # 62 of 5642 HS2007 codes do not have a corresponding HS2017 code (would say thats pretty good!)
 
-XLSX.writetable("clean/table_correspondence.xlsx", c_table, overwrite=true)
+XLSX.writetable("clean/table_correspondence_HS_NACE.xlsx", c_table_HS_NACE, overwrite=true)
 
 # ---------- WTO tariffs -----------------------------------------------------------------------------------------------------------------
 
@@ -54,10 +54,10 @@ end
 
 # ---------- Correspondence: Tariffs to NACE Rev.2 -----------------------------------------------------------------------------------------------------------------
 
-dropmissing!(c_table) # cannot join on column with missing values
+dropmissing!(c_table_HS_NACE) # cannot join on column with missing values
 raw_tariffs = raw_tariffs[map(x->length(x), raw_tariffs[:, :HS2017]).==6, :] # only keep 6 digit HS codes
 
-tariff_NACE = leftjoin(raw_tariffs, c_table, on=:HS2017)
+tariff_NACE = leftjoin(raw_tariffs, c_table_HS_NACE, on=:HS2017)
 describe(tariff_NACE) # 172 of 11.330 missing due to matching, 623 of 11.330 missing due to data reported missing
 # what to do with missing tariff data? either drop or assume zero tariffs, i.e. impacts the calculation of the average
 

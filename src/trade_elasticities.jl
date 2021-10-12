@@ -5,20 +5,63 @@
 
 using DataFrames, CSV, XLSX
 
-raw_sigma = CSV.read("data/sigma_v9195.txt", DataFrame) # data for elasticities
-raw_names = CSV.read("data/country_m49_iso3.csv", DataFrame) # correspondance table for country names
+# ---------- Match elasticities with WIOD ISO3 names -------------------------------------------------------------------------------------------------------
 
-raw_sigma[!, [:model, :method]] = convert.(String, raw_sigma[:, [:model, :method]]) # convert to string to use XLSX.writetable()
+# elasticities
+raw_sigma = CSV.read("data/sigma_v9195.txt", DataFrame) # data for elasticities
 rename!(raw_sigma, :j => :m49) # change column name to join on identifier "m49"
 
-joined = leftjoin(raw_sigma, raw_names, on = :m49) # join table
+# M49 vis-a-vis ISO3 country names
+raw_names = CSV.read("data/country_m49_iso3.csv", DataFrame)
 
-joined = joined[completecases(joined), :] # delete rows with missing values
-transform!(joined, [:country, :iso3] .=> ByRow(string) .=> [:country, :iso3], renamecols=false) # change type to string to use XLSX.writetable()
+# join tables
+c_table_ctry = leftjoin(raw_sigma, raw_names, on = :m49) # join table
+c_table_ctry = c_table_ctry[completecases(c_table_ctry), :] # delete rows with missing values
+transform!(c_table_ctry, [:isic3, :model, :method, :country, :iso3] .=> ByRow(string) .=> [:isic3, :model, :method, :country, :iso3], renamecols=false) # change type to string to use XLSX.writetable()
 
-# Still needs a match between ISIC Rev.3 and NACE Rev.2
-# could not find a direct match, possible to use ISIC Rev. 3.1 as all included sectors were not changed
-# however, still not possible to match properly (matching based on own judgement resultet in about 5-10 sectoral elasticities not 16 as authors claim)
-# correspondance tables on Eurostat (RAMON): https://ec.europa.eu/eurostat/ramon/index.cfm?TargetUrl=DSP_PUB_WELC
+XLSX.writetable("clean/table_elasticities.xlsx", c_table_ctry, overwrite=true)
 
-XLSX.writetable("clean/table_elasticities.xlsx", joined, overwrite=true)
+# ---------- Correspondence table for ISIC to NACE -------------------------------------------------------------------------------------------------------
+
+# Cannot match directly between ISIC Rev.3 and NACE Rev.2
+# Solution: ISIC Rev.3 to ISIC Rev.3.1 to ISIC Rev.4 to NACE Rev.2 to classification used in paper (i.e. small aggregations)
+
+# ISIC Rev.3 vis-a-vis ISIC Rev.3.1
+raw_ISIC3_ISIC31 = CSV.read("data/ISIC3_ISIC31.txt", DataFrame)[:, Not(["partial3", "partial31", "Activity"])]
+rename!(raw_ISIC3_ISIC31, [:ISIC3, :ISIC31])
+raw_ISIC3_ISIC31 = string.(raw_ISIC3_ISIC31)
+raw_ISIC3_ISIC31 = lpad.(raw_ISIC3_ISIC31, 4, '0') # pad with leading zeros so all have 4 digits
+
+# ISIC Rev.3.1 vis-a-vis ISIC Rev.4
+raw_ISIC31_ISIC4 = CSV.read("data/ISIC31_ISIC4.txt", DataFrame)[:, Not(["partialISIC31", "partialISIC4", "Detail"])]
+rename!(raw_ISIC31_ISIC4, [:ISIC31, :ISIC4])
+raw_ISIC31_ISIC4 = string.(raw_ISIC31_ISIC4)
+raw_ISIC31_ISIC4 = lpad.(raw_ISIC31_ISIC4, 4, '0') # pad with leading zeros so all have 4 digits
+
+# ISIC Rev.4 vis-a-vis NACE Rev.2
+raw_ISIC4_NACE2 = CSV.read("data/ISIC4_NACE2.csv", DataFrame)[2:end, 1:2]
+rename!(raw_ISIC4_NACE2, [:ISIC4, :CPA2008]) # rename to CPA2008 as only numerical NACE codes (i.e. no A01 but just 01 which correspond to CPA2008)
+raw_ISIC4_NACE2 = string.(raw_ISIC4_NACE2) # remove all one digit codes (otherwise bounds error below since we select first two characters)
+filter!(row -> length(row.CPA2008) > 1, raw_ISIC4_NACE2)
+f(x) = x[1:2] # select first two elements of cell
+raw_ISIC4_NACE2[:, :CPA2008] = f.(raw_ISIC4_NACE2[:, :CPA2008]) # aggregates CPA2008 to two digit level (i.e. match all codes to just two digit level)
+
+# CPA2008 (2 digits) vis-a-vis NACE Rev.2 (and the WIOD classification of sectors which aggregates some NACE)
+raw_CPA_NACE = CSV.read("data/CPA2008_NACE2.csv", DataFrame)
+transform!(raw_CPA_NACE, names(raw_CPA_NACE) .=> ByRow(string) .=> names(raw_CPA_NACE), renamecols=false) # change type to string
+raw_CPA_NACE[:, :CPA2digits] = lpad.(raw_CPA_NACE[:, :CPA2digits], 2, '0') # pad with leading zeros so all have 2 digits
+
+# join table to create a single correspondence table
+c_table_ISIC_NACE = leftjoin(raw_ISIC3_ISIC31, raw_ISIC31_ISIC4, on=:ISIC31)
+c_table_ISIC_NACE = leftjoin(c_table_ISIC_NACE, raw_ISIC4_NACE2, on=:ISIC4)
+rename!(c_table_ISIC_NACE, :CPA2008 => :CPA2digits)
+c_table_ISIC_NACE = leftjoin(c_table_ISIC_NACE, raw_CPA_NACE, on=:CPA2digits)
+
+XLSX.writetable("clean/table_correspondence_ISIC_NACE.xlsx", c_table_ISIC_NACE, overwrite=true)
+
+# ---------- Match elasticities with NACE Rev.2 -------------------------------------------------------------------------------------------------------
+
+rename!(c_table_ctry, :isic3 => :ISIC3)
+c_table_ctry[:, :ISIC3] = rpad.(c_table_ctry[:, :ISIC3], 4, '0') # add a zero since since we match with 4 digit codes
+
+elas_NACE = leftjoin(c_table_ctry, c_table_ISIC_NACE, on=:ISIC3) # lose a lot of sectors due to matching problems (possibly need to pad with 1-9 as well?)
