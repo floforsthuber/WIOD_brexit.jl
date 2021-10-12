@@ -21,4 +21,4 @@ transform!(joined, [:country, :iso3] .=> ByRow(string) .=> [:country, :iso3], re
 # however, still not possible to match properly (matching based on own judgement resultet in about 5-10 sectoral elasticities not 16 as authors claim)
 # correspondance tables on Eurostat (RAMON): https://ec.europa.eu/eurostat/ramon/index.cfm?TargetUrl=DSP_PUB_WELC
 
-XLSX.writetable("data/matching_elasticities.xlsx", joined, overwrite=true)
+XLSX.writetable("clean/table_elasticities.xlsx", joined, overwrite=true)

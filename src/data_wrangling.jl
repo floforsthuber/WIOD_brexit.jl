@@ -65,5 +65,5 @@ col_names = DataFrame(hcat(zeros(4, 4), col_names), :auto) # transform into data
 
 raw_wide_EU = vcat(col_names, DataFrame(Matrix(raw_wide_EU), :auto)) # transform column names so they can be joined
 
-XLSX.writetable("data/raw_wide_EU.xlsx", raw_wide_EU, overwrite=true)
+XLSX.writetable("clean/raw_wide_EU.xlsx", raw_wide_EU, overwrite=true)
 

@@ -9,7 +9,7 @@ using DataFrames, XLSX, LinearAlgebra
 # ---------- Load data -------------------------------------------------------------------------------------------------------
 
 # Subsample of EU27+GB (code also works for original dataset too only need to adjust the row bounds from 6/5 to 7/6 and N = 43+1)
-path = "data/raw_wide_EU.xlsx"
+path = "clean/raw_wide_EU.xlsx"
 
 raw = DataFrame(XLSX.readxlsx(path)["Sheet1"][:], :auto)
 
