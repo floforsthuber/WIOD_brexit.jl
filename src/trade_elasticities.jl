@@ -3,7 +3,7 @@
 # Using trade elasticities from Imbs and Mejean (2017) (http://www.isabellemejean.com/data.html)
 # http://www.isabellemejean.com/data.html in the folder for the paper "Trade elasticities", "/data_trade_elasticities/sigma_v9195.txt"
 
-using DataFrames, CSV, XLSX
+using DataFrames, CSV, XLSX, Statistics
 
 # ---------- Match elasticities with WIOD ISO3 names -------------------------------------------------------------------------------------------------------
 
@@ -62,6 +62,45 @@ XLSX.writetable("clean/table_correspondence_ISIC_NACE.xlsx", c_table_ISIC_NACE, 
 # ---------- Match elasticities with NACE Rev.2 -------------------------------------------------------------------------------------------------------
 
 rename!(c_table_ctry, :isic3 => :ISIC3)
-c_table_ctry[:, :ISIC3] = rpad.(c_table_ctry[:, :ISIC3], 4, '0') # add a zero since since we match with 4 digit codes
 
-elas_NACE = leftjoin(c_table_ctry, c_table_ISIC_NACE, on=:ISIC3) # lose a lot of sectors due to matching problems (possibly need to pad with 1-9 as well?)
+# lose too many sectors when matching to 4 digits with adding a zero, therefore, change ISIC into 2 digits and match
+#c_table_ctry[:, :ISIC3] = rpad.(c_table_ctry[:, :ISIC3], 4, '1') # add a zero since since we match with 4 digit codes (lose too many sectors)
+c_table_ctry[:, :ISIC3] = f.(c_table_ctry[:, :ISIC3])
+c_table_ISIC_NACE[:, :ISIC3] = f.(c_table_ISIC_NACE[:, :ISIC3])
+
+elas_NACE = leftjoin(c_table_ctry, c_table_ISIC_NACE, on=:ISIC3) 
+
+dropmissing!(elas_NACE) # only two sectors which are not matched (38 and 39 - actually could not find ISIC sectors with these codes!)
+begin
+    EU27 = ["AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", 
+    "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE"]
+end
+filter!(row -> row.iso3 in [EU27; "GBR"], elas_NACE) # only keep EU27 and GBR
+
+# summary statistics per country
+gdf = groupby(elas_NACE, [:iso3])
+d_elas_NACE = combine(gdf, :sigma => mean => :avg, :sigma => maximum => :max, :sigma => minimum => :min) # elasticities only available for 11 countries
+
+# summary statistics per country-sector pairs (some sectors have multiple elasticities - need to average over them)
+gdf = groupby(elas_NACE, [:iso3, :WIOD])
+elas_NACE = combine(gdf, :sigma => mean => :sigma)
+
+# ---------- Final table containinng all elasticities, countries, sectors -------------------------------------------------------------------------------------------
+
+# use the country-sector elasticities and assume an elasticity of -4 per sector for all other country-sector partialISIC31
+
+WIOD = raw_CPA_NACE.WIOD
+unique!(WIOD)
+
+N = size(EU27, 1) + 1 # EU27 + GBR
+S = size(WIOD, 1)
+
+country = repeat([EU27; "GBR"], inner=S)
+WIOD = repeat(WIOD, outer=N)
+d_ctry_WIOD = DataFrame(iso3 = country, WIOD = WIOD)
+
+all_elasticities = leftjoin(d_ctry_WIOD, elas_NACE, on=[:iso3, :WIOD]) # have elasticities for about 15 sectors per available country
+all_elasticities = coalesce.(all_elasticities, 4.0) # assume elasticity of -4 for all the missing country-sector pairs
+sort!(all_elasticities, [:iso3, :WIOD])
+
+XLSX.writetable("clean/all_elasticities.xlsx", all_elasticities, overwrite=true)

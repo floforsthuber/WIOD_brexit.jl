@@ -42,7 +42,7 @@ delete = ["Base nomenclature", "Number of subheadings", "Number of lines", "Numb
  "List of unit values", "Exchange rate", "Import value"]
 end
 
-raw_tariffs = CSV.read("data/MFN_tariffs.txt", DataFrame)[:, Not(delete)]
+raw_tariffs = CSV.read("data/MFN_tariffs_2020.txt", DataFrame)[:, Not(delete)]
 col_names = ["reporter", "year", "HS_level", "HS2017", "avtariff_avg", "avtariff_min", "avtariff_max", "tariff_free", "HS2017_long"] # new names
 rename!(raw_tariffs, col_names) # rename columns
 transform!(raw_tariffs, [:reporter, :HS2017, :HS2017_long] .=> ByRow(string) .=> [:reporter, :HS2017, :HS2017_long], renamecols=false) # change type to string
@@ -91,4 +91,3 @@ begin
     
     savefig(figure1, "clean/figure1.png")
 end
-
