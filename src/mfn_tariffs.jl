@@ -88,6 +88,6 @@ begin
      color=:red, label="sample average with zero tariffs = $(round(mean(d_tariff_NACE.avg), digits=1)) ")
     plot!(fill(mean(avg_zeros.avg), size(avg_zeros, 1)), width=2,
      color=:green, label="sample average of positive tariffs = $(round(mean(avg_zeros.avg), digits=1))")
-    
+    figure1
     savefig(figure1, "clean/figure1.png")
 end
