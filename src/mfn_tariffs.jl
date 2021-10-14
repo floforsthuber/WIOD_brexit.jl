@@ -1,6 +1,6 @@
-# WTO MFN tariffs
+# Script to obtain sectoral WTO MFN tariffs
 
-# In the paper they use US-EU MFN tariffs as a proxy for hard Brexit (should only need to download US-DE since same trade policy at EU level)
+# In the paper they use EU MFN tariffs as a proxy for hard Brexit (take EU as reporter country)
 # Tariffs are levied at product level (HS6), thus they need to be aggregated to the 56 sectors of the WIOD table.
 # Use the correspondence of HS2007 and CPA2008 (obtained via Eurostat: RAMON)
 # WTO tariff data was obtained via: http://tariffdata.wto.org/Default.aspx?culture=en-US
@@ -85,9 +85,40 @@ begin
     ylabel!("AV Applied Tariff (%)")
     scatter!(d_tariff_NACE.avg, label="average", color=:blue)
     plot!(fill(mean(d_tariff_NACE.avg), size(d_tariff_NACE,1)), width=2,
-     color=:red, label="sample average with zero tariffs = $(round(mean(d_tariff_NACE.avg), digits=1)) ")
+     color=:red, label="sample average of tariffs = $(round(mean(d_tariff_NACE.avg), digits=1)) ")
     plot!(fill(mean(avg_zeros.avg), size(avg_zeros, 1)), width=2,
-     color=:green, label="sample average of positive tariffs = $(round(mean(avg_zeros.avg), digits=1))")
+     color=:green, label="sample average of non-zero tariffs = $(round(mean(avg_zeros.avg), digits=1))")
     figure1
     savefig(figure1, "clean/figure1.png")
 end
+
+# ---------- Final table containinng all tariffs (MFN, NTB), countries, sectors -------------------------------------------------------------------------------------------
+
+# also include non tariff barriers (NTBs) for "soft" brexit (2.77%) and "hard" brexit (8.31%)
+# NTBs are based on Dhingra et al. (2017) and Berden et al. (2009)
+
+WIOD = raw_CPA_NACE.WIOD
+unique!(WIOD)
+
+begin
+    EU27 = ["AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", 
+    "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE"]
+end
+
+N = size(EU27, 1) + 1 # EU27 + GBR
+S = size(WIOD, 1)
+
+country = repeat([EU27; "GBR"], inner=S)
+WIOD = repeat(WIOD, outer=N)
+d_ctry_WIOD = DataFrame(iso3 = country, WIOD = WIOD, NTB_soft=2.77, NTB_hard=8.31)
+
+gdf = groupby(tariff_NACE, [:reporter, :WIOD])
+avg_tariff_NACE = combine(gdf, :avtariff_avg => mean => :avg_tariff) # we lose some sectors (non-tradables, for example public administration)
+filter!(row -> row.reporter == "European Union", avg_tariff_NACE)
+
+all_tariffs = leftjoin(d_ctry_WIOD, avg_tariff_NACE[:, Not(:reporter)], on=:WIOD) # we do not have tariffs in 27 sectors (get lost when grouping data according to sectors)
+# what to do? assume zero tariffs since not reported
+all_tariffs = coalesce.(all_tariffs, 0.0) # assume zero tariffs for missing sectors
+sort!(all_tariffs, [:iso3, :WIOD])
+
+XLSX.writetable("clean/all_tariffs.xlsx", all_tariffs, overwrite=true)

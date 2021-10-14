@@ -1,4 +1,4 @@
-# Trade elasticities
+# Script to obtain sectoral-country trade elasticities
 
 # Using trade elasticities from Imbs and Mejean (2017) (http://www.isabellemejean.com/data.html)
 # http://www.isabellemejean.com/data.html in the folder for the paper "Trade elasticities", "/data_trade_elasticities/sigma_v9195.txt"

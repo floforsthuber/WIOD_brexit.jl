@@ -1,4 +1,4 @@
-# Create leontief inverse matrix
+# Script to create leontief inverse matrix, exports and value added
 
 using DataFrames, XLSX, LinearAlgebra
 
@@ -56,18 +56,3 @@ v_add_share = (outputs .- inputs) ./ outputs # N*S×1,
 #       maybe problem lies in the importing of the data and conversion to matrix, possibly multiply by 1million so we have bigger values form the start?
 #       possibly solved when restricting sample to EU27+UK
 # 
-
-using Plots
-histogram(v_add_share, xlims=(-1,1))
-
-histogram(v_add_share, normalize=:probability, xlims=(-1,1))
-
-size(v_add_share[v_add_share .< 1.0 & v_add_share .> -1.0])
-
-v_add_share[v_add_share in -1:1]
-
-
-a = v_add_share[v_add_share .> -1.0]
-a[a .< 1.0]
-
-size(a, 1)/size(v_add_share, 1)
