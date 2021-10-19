@@ -83,3 +83,17 @@ total_ctry_loss_soft = [sum(total_loss_soft[i:i+S-1]) for i in 1:S:S*N] # N×1
 total_ctry_loss_hard = [sum(total_loss_hard[i:i+S-1]) for i in 1:S:S*N] # N×1
 
 
+
+
+
+total = DataFrame(iso3 = sort(EU27), total_soft = total_ctry_loss_soft, total_hard = total_ctry_loss_hard)
+
+#using StatsPlots
+
+begin
+    bar(-total_ctry_loss_hard, bar_position = :dodge, bar_width=0.7, 
+    xticks=(1:length(EU27), sort(EU27)), xrotation=90)
+end
+
+
+

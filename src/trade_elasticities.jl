@@ -100,7 +100,7 @@ WIOD = repeat(WIOD, outer=N)
 d_ctry_WIOD = DataFrame(iso3 = country, WIOD = WIOD)
 
 all_elasticities = leftjoin(d_ctry_WIOD, elas_NACE, on=[:iso3, :WIOD]) # have elasticities for about 15 sectors per available country
-all_elasticities = coalesce.(all_elasticities, 4.0) # assume elasticity of -4 for all the missing country-sector pairs
+all_elasticities = coalesce.(all_elasticities, 5.0) # assume elasticity of -4 for all the missing country-sector pairs
 sort!(all_elasticities, [:iso3, :WIOD])
 
 XLSX.writetable("clean/all_elasticities.xlsx", all_elasticities, overwrite=true)
