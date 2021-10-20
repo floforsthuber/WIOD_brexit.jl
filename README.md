@@ -9,3 +9,7 @@ be accessed from the KU Leuven library via this [link](https://lirias.kuleuven.b
 The entire input data and output for this code is accessible via my personal Google Drive.
 
 ![plot](C:/Users/u0148308/git/WIOD_brexit/clean/figure1.png)
+
+<p align="center">
+  <img src="C:/Users/u0148308/git/WIOD_brexit/clean/figure1.png" width="350" title="hover text">
+</p>
