@@ -83,6 +83,7 @@ begin
      d_tariff_NACE.Figure1), ylims=(0,25), xrotation=90, label="min/max", color=:orange)
     xlabel!("NACE Rev. 2 activties")
     ylabel!("AV Applied Tariff (%)")
+    title!("Sectoral tariff rates applied by the EU")
     scatter!(d_tariff_NACE.avg, label="average", color=:blue)
     plot!(fill(mean(d_tariff_NACE.avg), size(d_tariff_NACE,1)), width=2,
      color=:red, label="sample average of tariffs = $(round(mean(d_tariff_NACE.avg), digits=1)) ")
