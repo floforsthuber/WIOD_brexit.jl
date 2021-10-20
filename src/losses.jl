@@ -83,44 +83,32 @@ total_ctry_loss_soft = [sum(total_loss_soft[i:i+S-1]) for i in 1:S:S*N] # N×1
 total_ctry_loss_hard = [sum(total_loss_hard[i:i+S-1]) for i in 1:S:S*N] # N×1
 
 
-# some plots
+# some plots and tables
 
-
-total = DataFrame(iso3 = sort(EU27), total_soft = total_ctry_loss_soft, total_hard = total_ctry_loss_hard)
+ctry_loss_wide = hcat(sort(EU27), direct_ctry_loss_soft, direct_ctry_loss_hard, indirect_ctry_loss_soft, indirect_ctry_loss_hard, total_ctry_loss_soft, total_ctry_loss_hard)
+ctry_loss_wide = DataFrame(ctry_loss_wide, :auto)
+rename!(ctry_loss_wide, [:iso3, :direct_soft, :direct_hard, :indirect_soft, :indirect_hard, :total_soft, :total_hard])
+ctry_loss_long = stack(ctry_loss_wide, Not(:iso3))
+ctry_loss_long = hcat(ctry_loss_long, DataFrame(reduce(vcat, permutedims.(split.(ctry_loss_long.variable, "_"))), [:channel, :scenario]))
+select(ctry_loss_long, Not(:variable))
 
 using StatsPlots
 
-begin
-    groupedbar(total.iso3, -[total_ctry_loss_soft total_ctry_loss_hard], bar_width=0.7, xrotation=90, label="soft")
-    xlabel!("Countries")
-    ylabel!("Loss in million euro")
+function grouped_bar_plot(scenario, channel, type, name)
+    df = filter(row -> row.channel in channel && row.scenario == scenario, ctry_loss_long)
+    plot = groupedbar(df[:, :iso3], -df.value/1000, group=df.channel, bar_width=0.8, bar_position=type, xrotation=90, color=[:red :blue])
+    xlabel!("EU27")
+    ylabel!("billion euro")
+    title!("Loss in value added in a $scenario Brexit scenario")
+    savefig(plot, "clean/$name.png")
+    #savefig(plot, "clean/$name.html")
+    return plot
 end
 
+# direct vis-a-vis indirect loss per country
+grouped_bar_plot("soft", ["direct", "indirect"], :dodge, "soft_split")
+grouped_bar_plot("hard", ["direct", "indirect"], :dodge, "hard_split")
 
-total = DataFrame(iso3 = sort(EU27), soft = total_ctry_loss_soft, hard = total_ctry_loss_hard)
-total = stack(total, Not(:iso3))
-
-begin
-    groupedbar(total.iso3, -total.value/1000, group=total.variable, bar_width=0.7, xrotation=90)
-    xlabel!("Countries")
-    ylabel!("Loss in billion euro")
-end
-
-soft = DataFrame(iso3 = sort(EU27), direct = direct_ctry_loss_soft, indirect = indirect_ctry_loss_soft)
-soft = stack(soft, Not(:iso3))
-
-begin
-    groupedbar(soft.iso3, -soft.value/1000, group=soft.variable, bar_width=0.7, xrotation=90)
-    xlabel!("Countries")
-    ylabel!("Loss in billion euro")
-end
-
-
-hard = DataFrame(iso3 = sort(EU27), direct = direct_ctry_loss_hard, indirect = indirect_ctry_loss_hard)
-hard = stack(hard, Not(:iso3))
-
-begin
-    groupedbar(hard.iso3, -hard.value/1000, group=hard.variable, bar_width=0.7, xrotation=90)
-    xlabel!("Countries")
-    ylabel!("Loss in billion euro")
-end
+# total loss per country
+grouped_bar_plot("soft", ["direct", "indirect"], :stack, "soft_total")
+grouped_bar_plot("hard", ["direct", "indirect"], :dodge, "hard_total")

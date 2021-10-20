@@ -19,10 +19,10 @@ N = 27 + 1 # number of countries, EU27+GB
 S = 56 # number of sectors
 
 # cut out the additional variables in beginning/end (to have square matrix) (N*S×N*S rows/columns)
-raw_D = raw[6:N*S+5, 5:N*S+4]
+raw_D = raw[6:N*S+5, 5:N*S+4] # intermediary demand data
 # cut sectoral input/output so only final demand variables remain (S*N rows and 5*N columns - 5 different measures of final demand:
 # households/government/NGOs/inventory/capital_formation)
-raw_FD = raw[6:N*S+5, 5+N*S:4+N*S+5*N]
+raw_FD = raw[6:N*S+5, 5+N*S:4+N*S+5*N] # final demand data
 
 # convert into matrix (cannot make matrix calculations with DataFrames)
 D = Matrix(convert.(Float64, raw_D)) # N*S×N*S
@@ -60,25 +60,15 @@ transform!(all_value_added, [:iso3, :WIOD] .=> ByRow(string) .=> [:iso3, :WIOD],
 
 XLSX.writetable("clean/all_value_added.xlsx", all_value_added, overwrite=true)
 
-# value added of sector k and country i (total): (output-input)/output
-#v_add_share_without_fd = (outputs .- inputs) ./ outputs # N*S×1, without final demand (probably wrong)
-
-
-# Problems with value added:
-# 1.    what to do with negative numbers (inputs > outputs), 1.0 (value added is all), Inf (no output)
-#       maybe problem lies in the importing of the data and conversion to matrix, possibly multiply by 1million so we have bigger values form the start?
-#       possibly solved when restricting sample to EU27+UK
-#
-
 # ---------- Leontief inverse matrix -------------------------------------------------------------------------------------------------------
 
 # technical coefficients: "a dollar's value of inputs from country i into sector k per a dollar's worth of output of country j in sector s"
 A = similar(D)
 
-# we need to use final demand here!
+# divide by entire output of country-sector pair
 for i in 1:size(A, 1)
     for j in 1:size(A, 2)
-        A[i, j] = D[i, j] / outputs_total[i] # if I use final instead, I cannot invert the matrix below
+        A[i, j] = D[i, j] / outputs_total[i]
     end
 end
 

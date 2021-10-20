@@ -6,4 +6,6 @@
 The original paper *Global Value Chains, Trade Shocks and Jobs: An Application to Brexit* was written by Hylke Vandenbussche, William Connell and Wouter Simons and 
 be accessed from the KU Leuven library via this [link](https://lirias.kuleuven.be/retrieve/535608).
 
-The data and output for this code is accessible via my personal Google Drive via this link.
+The entire input data and output for this code is accessible via my personal Google Drive.
+
+![plot](C:/Users/u0148308/git/WIOD_brexit/clean/figure1.png)

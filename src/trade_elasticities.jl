@@ -87,7 +87,7 @@ elas_NACE = combine(gdf, :sigma => mean => :sigma)
 
 # ---------- Final table containinng all elasticities, countries, sectors -------------------------------------------------------------------------------------------
 
-# use the country-sector elasticities and assume an elasticity of -4 per sector for all other country-sector partialISIC31
+# use the country-sector elasticities and assume an elasticity of -4 per sector for all other country-sector pairs
 
 WIOD = raw_CPA_NACE.WIOD
 unique!(WIOD)
