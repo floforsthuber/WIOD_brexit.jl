@@ -13,3 +13,9 @@ The entire input data and output for this code is accessible via my personal Goo
 <p align="center">
   <img src="C:/Users/u0148308/git/WIOD_brexit/clean/figure1.png" width="350" title="hover text">
 </p>
+
+
+![alt text](https://github.com/forsthuber92/WIOD_brexit.jl/blob/main/soft_split.png?raw=true)
+
+
+![alt text](https://raw.githubusercontent.com/forsthuber92/WIOD_brexit.jl/main/images/soft_split.png)

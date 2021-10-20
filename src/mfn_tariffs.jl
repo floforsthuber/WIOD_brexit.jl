@@ -121,4 +121,4 @@ all_tariffs = leftjoin(d_ctry_WIOD, avg_tariff_NACE[:, Not(:reporter)], on=:WIOD
 all_tariffs = coalesce.(all_tariffs, 0.0) # assume zero tariffs for missing sectors
 sort!(all_tariffs, [:iso3, :WIOD])
 
-XLSX.writetable("clean/all_tariffs.xlsx", all_tariffs, overwrite=true)
+XLSX.writetable("images/all_tariffs.xlsx", all_tariffs, overwrite=true)

@@ -100,7 +100,7 @@ function grouped_bar_plot(scenario, channel, type, name)
     xlabel!("EU27")
     ylabel!("billion euro")
     title!("Loss in value added in a $scenario Brexit scenario")
-    savefig(plot, "clean/$name.png")
+    savefig(plot, "images/$name.png")
     #savefig(plot, "clean/$name.html")
     return plot
 end
