@@ -13,7 +13,7 @@ The entire input data and output for this code is accessible via [Google Drive](
 The following figures show the final figures obtained. My results seem to coincide with most of the figures obtained by Vandenbussche, Connell and Simons, 
 however, there are some considerable difference in the losses, in particular for the big European economies (DE, FR, IT).
 
-I think the problem lies in an alternative matching of the sectoral elasticities, hence, some more work is required.
+***I think the problem lies in an alternative matching of the sectoral elasticities, hence, some more work is required.***
 
 Corresponds to figure 1 on page 28:
 ![Figure corresponds to figure 1 on page 28](https://raw.githubusercontent.com/forsthuber92/WIOD_brexit.jl/main/images/figure1.png)
