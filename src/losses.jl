@@ -88,6 +88,9 @@ total_ctry_loss_hard = [sum(total_loss_hard[i:i+S-1]) for i in 1:S:S*N] # N×1
 ctry_loss_wide = hcat(sort(EU27), direct_ctry_loss_soft, direct_ctry_loss_hard, indirect_ctry_loss_soft, indirect_ctry_loss_hard, total_ctry_loss_soft, total_ctry_loss_hard)
 ctry_loss_wide = DataFrame(ctry_loss_wide, :auto)
 rename!(ctry_loss_wide, [:iso3, :direct_soft, :direct_hard, :indirect_soft, :indirect_hard, :total_soft, :total_hard])
+
+XLSX.writetable("clean/all_losses.xlsx", ctry_loss_wide, overwrite=true)
+
 ctry_loss_long = stack(ctry_loss_wide, Not(:iso3))
 ctry_loss_long = hcat(ctry_loss_long, DataFrame(reduce(vcat, permutedims.(split.(ctry_loss_long.variable, "_"))), [:channel, :scenario]))
 select(ctry_loss_long, Not(:variable))

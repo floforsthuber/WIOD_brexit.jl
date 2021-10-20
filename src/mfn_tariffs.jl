@@ -89,7 +89,7 @@ begin
     plot!(fill(mean(avg_zeros.avg), size(avg_zeros, 1)), width=2,
      color=:green, label="sample average of non-zero tariffs = $(round(mean(avg_zeros.avg), digits=1))")
     figure1
-    savefig(figure1, "clean/figure1.png")
+    savefig(figure1, "images/figure1.png")
 end
 
 # ---------- Final table containinng all tariffs (MFN, NTB), countries, sectors -------------------------------------------------------------------------------------------
@@ -121,4 +121,4 @@ all_tariffs = leftjoin(d_ctry_WIOD, avg_tariff_NACE[:, Not(:reporter)], on=:WIOD
 all_tariffs = coalesce.(all_tariffs, 0.0) # assume zero tariffs for missing sectors
 sort!(all_tariffs, [:iso3, :WIOD])
 
-XLSX.writetable("images/all_tariffs.xlsx", all_tariffs, overwrite=true)
+XLSX.writetable("clean/all_tariffs.xlsx", all_tariffs, overwrite=true)
