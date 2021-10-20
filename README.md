@@ -15,16 +15,19 @@ however, there are some considerable difference in the losses, in particular for
 
 I think the problem lies in an alternative matching of the sectoral elasticities, hence, some more work is required.
 
+Corresponds to figure 1 on page 28:
 ![Figure corresponds to figure 1 on page 28](https://raw.githubusercontent.com/forsthuber92/WIOD_brexit.jl/main/images/figure1.png)
 <br/>
 
+Corresponds to table 2 in the appendix:
 ![Figure corresponds to table 2 in the appendix:](https://raw.githubusercontent.com/forsthuber92/WIOD_brexit.jl/main/images/soft_total.png)
 <br/>
 
+Corresponds to table 3 in the appendix:
 ![Figure corresponds to table 3 in the appendix:](https://raw.githubusercontent.com/forsthuber92/WIOD_brexit.jl/main/images/hard_total.png)
 <br/>
 
-# Final nots
+# Final notes
 
 I would like to express my gratitute to the staff of Eurostat who helped tremendously in using 
 [RAMON](https://ec.europa.eu/eurostat/ramon/index.cfm?TargetUrl=DSP_PUB_WELC) correspondence tables and my colleagues for their many excellent comments.
