@@ -5,17 +5,17 @@
 
 <br/>
 
-The original paper *Global Value Chains, Trade Shocks and Jobs: An Application to Brexit* was written by Hylke Vandenbussche, William Connell and Wouter Simons and 
+The original paper *Global Value Chains, Trade Shocks and Jobs: An Application to Brexit* was written by Hylke Vandenbussche, William Connell and Wouter Simons (2019) and 
 can be accessed from the KU Leuven library via this [link](https://lirias.kuleuven.be/retrieve/535608).
 
 The entire input and output for this code is accessible via my [Google Drive](https://drive.google.com/drive/folders/18siumEZlDlu2N4TaKuEF4vds1VpMQJU-?usp=sharing).
 
-# Preliminary results
+# Results
 
-The following figures show the final figures obtained. My results coincide with most of the figures obtained by Vandenbussche, Connell and Simons, 
+The following figures show the final figures obtained. My results coincide with most of the figures obtained by *Vandenbussche, Connell and Simons (2019)*, 
 however, there are are sizeable differences in the loss of value added in both Brexit scenarios for the big European economies (DE, FR, IT).
 
-***I think the problem lies in an alternative matching of the sectoral elasticities, hence, some more work is required.***
+***I suspect the problem lies in an alternative matching of the sectoral elasticities, hence, some more refinement is required.***
 
 Corresponds to figure 1 on page 28:
 ![Figure corresponds to figure 1 on page 28](https://raw.githubusercontent.com/forsthuber92/WIOD_brexit.jl/main/images/figure1.png)
