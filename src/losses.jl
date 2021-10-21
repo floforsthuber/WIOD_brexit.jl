@@ -113,5 +113,5 @@ grouped_bar_plot("soft", ["direct", "indirect"], :dodge, "soft_split")
 grouped_bar_plot("hard", ["direct", "indirect"], :dodge, "hard_split")
 
 # total loss per country
-grouped_bar_plot("soft", ["direct", "indirect"], :stack, "soft_total")
+grouped_bar_plot("soft", ["direct", "indirect"], :dodge, "soft_total")
 grouped_bar_plot("hard", ["direct", "indirect"], :dodge, "hard_total")

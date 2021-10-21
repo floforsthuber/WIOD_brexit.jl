@@ -68,7 +68,7 @@ A = similar(D)
 # divide by entire output of country-sector pair
 for i in 1:size(A, 1)
     for j in 1:size(A, 2)
-        A[i, j] = D[i, j] / outputs_total[i]
+        A[i, j] = D[i, j] / outputs_total[j]
     end
 end
 
